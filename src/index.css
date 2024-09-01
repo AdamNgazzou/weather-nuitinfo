@@ -11,3 +11,12 @@
   display:grid;
   background-color: #ffffff;
 }
+
+
+@media (max-width: 570px){
+
+  .app{
+    max-height:100%;
+  
+  }
+}
