@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "main": "./dist/index.js",
-  "homepage": "https://your-github-pages-url.com", // Add this line
+  "homepage": "https://github.com/AdamNgazzou/weather", // Add this line
   "scripts": {
     "dev": "vite",
     "build": "vite build",
