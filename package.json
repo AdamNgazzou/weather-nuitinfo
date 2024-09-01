@@ -1,8 +1,10 @@
 {
-  "name": "wether",
+  "name": "weather",
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "main": "./dist/index.js",
+  "homepage": "https://your-github-pages-url.com", // Add this line
   "scripts": {
     "dev": "vite",
     "build": "vite build",
