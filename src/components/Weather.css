@@ -101,7 +101,7 @@
     
     }
     .search-bar input{
-        width:fit-content;
+        width:auto;
     }
     .temperature{
         font-size:65px;
