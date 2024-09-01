@@ -94,8 +94,21 @@
         
 
     }
-
-
+    .search-bar{
+        margin-right:5%;
+        padding:5px;
+        
+    
+    }
+    .search-bar input{
+        width:fit-content;
+    }
+    .temperature{
+        font-size:65px;
+    }
+    .location{
+        font-size:30px;
+    }
 
 @media (max-width: 396px){
     .weather{
