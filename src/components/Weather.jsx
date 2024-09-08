@@ -1,13 +1,25 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './Weather.css';
 import search_icon from '../assets/search.png';
-import clear_icon from '../assets/clear.png';
-import cloud_icon from '../assets/cloud.png';
-import drizzle_icon from '../assets/drizzle.png';
+import clear_icon_day from '../assets/clear-day.svg';
+import clear_icon_night from '../assets/clear-night.svg';
+
+import cloud_icon_day from '../assets/partly-cloudy-day.svg';
+import cloud_icon_night from '../assets/partly-cloudy-night.svg';
+
+
+import drizzle_icon_day from '../assets/partly-cloudy-day-drizzle.svg';
+import drizzle_icon_night from '../assets/partly-cloudy-night-drizzle.svg';
+
 import humidity_icon from '../assets/humidity.png';
-import rain_icon from '../assets/rain.png';
-import snow_icon from '../assets/snow.png';
-import wind_icon from '../assets/wind.png';
+import rain_icon from '../assets/partly-cloudy-day-rain.svg';
+
+import snow_icon_day from '../assets/partly-cloudy-day-snow.svg';
+import snow_icon_night from '../assets/partly-cloudy-night-snow.svg';
+
+import wind_icon from '../assets/wind.svg';
+import thunderStrom_icon_day from '../assets/thunderstorms-day.svg'
+import thunderStrom_icon_night from '../assets/thunderstorms-night.svg'
 
 const Weather = () => {
   const inputRef = useRef();
@@ -16,20 +28,24 @@ const Weather = () => {
   const [gradientAngle, setGradientAngle] = useState(180); // Start with 180 degrees
 
   const allIcons = {
-    '01d': clear_icon,
-    '01n': clear_icon,
-    '02d': cloud_icon,
-    '02n': cloud_icon,
-    '03d': cloud_icon,
-    '03n': cloud_icon,
-    '04d': drizzle_icon,
-    '04n': drizzle_icon,
+    '01d': clear_icon_day,
+    '01n': clear_icon_night,
+    '02d': cloud_icon_day,
+    '02n': cloud_icon_night,
+    '03d': cloud_icon_day,
+    '03n': cloud_icon_night,
+    '04d': drizzle_icon_day,
+    '04n': drizzle_icon_night,
     '09d': rain_icon,
     '09n': rain_icon,
     '10d': rain_icon,
+
+    '11d': thunderStrom_icon_day,
+    '11n': thunderStrom_icon_night,
     '10n': rain_icon,
-    '13d': snow_icon,
-    '13n': snow_icon,
+
+    '13d': snow_icon_day,
+    '13n': snow_icon_night,
   };
 
   const calculateGradientAngle = (timezoneOffset) => {
@@ -47,7 +63,6 @@ const Weather = () => {
       angle = 180 + localHour * 15; // 180 degrees at 12 AM to 360 degrees (or 0 degrees) at 12 PM
     }
 
-    console.log(angle);
 
     setGradientAngle(angle);
   };
@@ -63,7 +78,6 @@ const Weather = () => {
 
       const response = await fetch(url);
       const data = await response.json();
-      console.log(data);
       if (!response.ok) {
         alert(data.message);
         return false;
@@ -77,19 +91,19 @@ const Weather = () => {
         location: data.city.name,
         icon: icon,
       });
-
       // Calculate gradient angle based on the city's timezone
       calculateGradientAngle(data.city.timezone);
     } catch (error) {
       setWeatherData(false);
       console.error('Error in fetching weather data');
     } finally {
+      inputRef.current.value = '';
       setIsSearching(false);
     }
   };
 
   useEffect(() => {
-    search('Sousse'); // Default search
+    search('paris'); // Default search
   }, []);
 
   useEffect(() => {
@@ -106,6 +120,7 @@ const Weather = () => {
       window.removeEventListener('keydown', handleKeyPress);
     };
   }, []);
+
 
   return (
     <div
@@ -137,7 +152,7 @@ const Weather = () => {
               </div>
             </div>
             <div className='col' id='wind'>
-              <img src={wind_icon} alt='' />
+              <img src={wind_icon} alt='' width='70px' />
               <div>
                 <p>{weatherData.windSpeed} Km/h</p>
                 <span>Wind Speed</span>
