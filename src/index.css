@@ -9,7 +9,7 @@
 .app{
   min-height: 100vh;
   display:grid;
-  background-color: #ffffff;
+  background-image: linear-gradient(1deg, #000, #275d94, #cfcfcf);  background-size: cover;
 }
 
 
