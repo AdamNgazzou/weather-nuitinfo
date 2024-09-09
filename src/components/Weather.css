@@ -191,6 +191,7 @@
         display: flex; 
     }
     .weather{
+        border:none;
         display: none; 
         position:relative;
         margin:0;
