@@ -200,11 +200,10 @@
     }
 
     
-    .weather-data{
-        position:absolute;
-        bottom:1%;
-        padding-left:3%;
-        padding-right:4%;
+    #margining.weather-data{
+       margin-right:30px;
+       margin-top:30px;
+       margin-bottom:30px;
     }
 
     .search-bar{
@@ -242,14 +241,6 @@
             box-shadow: 0px !important;
         }
     }
-    
-    
-
-
-
-
-
-
 .humid{
     padding-top:12%;
 }
