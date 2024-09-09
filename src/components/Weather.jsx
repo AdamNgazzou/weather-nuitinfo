@@ -98,10 +98,10 @@ const Weather = () => {
       };
 
       setWeatherData(updateWeatherData(0));
-      setWeatherData1(updateWeatherData(1));
-      setWeatherData2(updateWeatherData(2));
-      setWeatherData3(updateWeatherData(3));
-      setWeatherData4(updateWeatherData(4));
+      setWeatherData1(updateWeatherData(7));
+      setWeatherData2(updateWeatherData(15));
+      setWeatherData3(updateWeatherData(23));
+      setWeatherData4(updateWeatherData(31));
 
       calculateGradientAngle(data.city.timezone);
     } catch (error) {
