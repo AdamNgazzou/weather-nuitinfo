@@ -211,9 +211,14 @@ const Weather = () => {
     }
 
   }
+  const width = window.innerWidth;
 
   return (
-    <div className="main">
+    <div className="main" style={{
+      ...(width <= 730
+        ? { backgroundImage: `linear-gradient(${gradientAngle}deg, #000000, #134980, #f18719)` } // Apply dynamic gradient
+        : {}),
+    }}>
       <div className='search-bar' >
         <input
           ref={inputRef}
