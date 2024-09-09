@@ -3,29 +3,31 @@ import './Weather.css';
 import search_icon from '../assets/search.png';
 import clear_icon_day from '../assets/clear-day.svg';
 import clear_icon_night from '../assets/clear-night.svg';
-
 import cloud_icon_day from '../assets/partly-cloudy-day.svg';
 import cloud_icon_night from '../assets/partly-cloudy-night.svg';
-
-
 import drizzle_icon_day from '../assets/partly-cloudy-day-drizzle.svg';
 import drizzle_icon_night from '../assets/partly-cloudy-night-drizzle.svg';
-
 import humidity_icon from '../assets/humidity.png';
 import rain_icon from '../assets/partly-cloudy-day-rain.svg';
-
 import snow_icon_day from '../assets/partly-cloudy-day-snow.svg';
 import snow_icon_night from '../assets/partly-cloudy-night-snow.svg';
-
 import wind_icon from '../assets/wind.svg';
-import thunderStrom_icon_day from '../assets/thunderstorms-day.svg'
-import thunderStrom_icon_night from '../assets/thunderstorms-night.svg'
+import thunderStrom_icon_day from '../assets/thunderstorms-day.svg';
+import thunderStrom_icon_night from '../assets/thunderstorms-night.svg';
+import ProgressBar from './ProgressBar';
 
 const Weather = () => {
   const inputRef = useRef();
+  const containerRef = useRef(null);
   const [isSearching, setIsSearching] = useState(false);
   const [weatherData, setWeatherData] = useState(false);
+  const [weatherData1, setWeatherData1] = useState(false);
+  const [weatherData2, setWeatherData2] = useState(false);
+  const [weatherData3, setWeatherData3] = useState(false);
+  const [weatherData4, setWeatherData4] = useState(false);
+
   const [gradientAngle, setGradientAngle] = useState(180); // Start with 180 degrees
+  const [progress, setProgress] = useState(0); // State for progress
 
   const allIcons = {
     '01d': clear_icon_day,
@@ -39,11 +41,9 @@ const Weather = () => {
     '09d': rain_icon,
     '09n': rain_icon,
     '10d': rain_icon,
-
     '11d': thunderStrom_icon_day,
     '11n': thunderStrom_icon_night,
     '10n': rain_icon,
-
     '13d': snow_icon_day,
     '13n': snow_icon_night,
   };
@@ -54,48 +54,63 @@ const Weather = () => {
     const localHour = localTime.getHours();
 
     let angle;
-
     if (localHour >= 12 && localHour < 24) {
-      // From 12 PM to 12 AM
       angle = (localHour - 12) * 15; // 0 degrees at 12 PM to 180 degrees at 12 AM
     } else {
-      // From 12 AM to 12 PM
       angle = 180 + localHour * 15; // 180 degrees at 12 AM to 360 degrees (or 0 degrees) at 12 PM
     }
-
 
     setGradientAngle(angle);
   };
 
   const search = async (city, forceRefresh = false) => {
     if (city === '' && !forceRefresh) {
-      alert('Enter City Name');
       return false;
     }
     setIsSearching(true);
     try {
       const url = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${import.meta.env.VITE_APP_ID}`;
-
       const response = await fetch(url);
       const data = await response.json();
+      console.log(data); // Check the structure of the data
+
       if (!response.ok) {
-        alert(data.message);
+        alert(data.message || 'Failed to fetch data');
         return false;
       }
 
-      const icon = allIcons[data.list[0].weather[0].icon] || clear_icon;
-      setWeatherData({
-        humidity: data.list[0].main.humidity,
-        windSpeed: data.list[0].wind.speed,
-        temperature: Math.floor(data.list[0].main.temp),
-        location: data.city.name,
-        icon: icon,
-      });
-      // Calculate gradient angle based on the city's timezone
+      // Check if data.list contains enough items
+      if (data.list.length < 5) {
+        alert('Not enough weather data available');
+        return false;
+      }
+
+      // Set weather data for different time slots
+      const updateWeatherData = (index) => {
+        const icon = allIcons[data.list[index].weather[0].icon] || clear_icon_day;
+        return {
+          humidity: data.list[index].main.humidity,
+          windSpeed: data.list[index].wind.speed,
+          temperature: Math.floor(data.list[index].main.temp),
+          location: data.city.name,
+          icon: icon,
+        };
+      };
+
+      setWeatherData(updateWeatherData(0));
+      setWeatherData1(updateWeatherData(1));
+      setWeatherData2(updateWeatherData(2));
+      setWeatherData3(updateWeatherData(3));
+      setWeatherData4(updateWeatherData(4));
+
       calculateGradientAngle(data.city.timezone);
     } catch (error) {
+      console.error('Error in fetching weather data:', error);
       setWeatherData(false);
-      console.error('Error in fetching weather data');
+      setWeatherData1(false);
+      setWeatherData2(false);
+      setWeatherData3(false);
+      setWeatherData4(false);
     } finally {
       inputRef.current.value = '';
       setIsSearching(false);
@@ -121,15 +136,85 @@ const Weather = () => {
     };
   }, []);
 
+  // Enable mouse dragging for horizontal scrolling
+  useEffect(() => {
+    const container = containerRef.current;
+    let isDown = false;
+    let startX;
+    let scrollLeft;
+
+    const handleMouseDown = (e) => {
+      isDown = true;
+      container.classList.add('active');
+      startX = e.pageX - container.offsetLeft;
+      scrollLeft = container.scrollLeft;
+    };
+
+    const handleMouseLeave = () => {
+      isDown = false;
+      container.classList.remove('active');
+    };
+
+    const handleMouseUp = () => {
+      isDown = false;
+      container.classList.remove('active');
+    };
+
+    const handleMouseMove = (e) => {
+      if (!isDown) return;
+      e.preventDefault();
+      const x = e.pageX - container.offsetLeft;
+      const walk = (x - startX) * 2; // Scroll speed
+      container.scrollLeft = scrollLeft - walk;
+    };
+
+    container.addEventListener('mousedown', handleMouseDown);
+    container.addEventListener('mouseleave', handleMouseLeave);
+    container.addEventListener('mouseup', handleMouseUp);
+    container.addEventListener('mousemove', handleMouseMove);
+
+    return () => {
+      container.removeEventListener('mousedown', handleMouseDown);
+      container.removeEventListener('mouseleave', handleMouseLeave);
+      container.removeEventListener('mouseup', handleMouseUp);
+      container.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, []);
+  useEffect(() => {
+    const container = containerRef.current;
+
+    const updateProgress = () => {
+      const scrollWidth = container.scrollWidth - container.clientWidth;
+      const scrollLeft = container.scrollLeft;
+      const newProgress = (scrollLeft / scrollWidth) * 100;
+      setProgress(newProgress);
+    };
+
+    container.addEventListener('scroll', updateProgress);
+
+    return () => {
+      container.removeEventListener('scroll', updateProgress);
+    };
+
+
+
+  }, []);
+  const weeking = (i) => {
+    const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const d = new Date();
+    const x = d.getDay();
+    if (x + i > 6) {
+      return weekday[x - (7 - i)];
+    }
+    else {
+      return weekday[x + i];
+    }
+
+  }
 
   return (
-    <div
-      className='weather'
-      style={{
-        backgroundImage: `linear-gradient(${gradientAngle}deg, #000000, #134980, #f18719)`, // Apply dynamic gradient
-      }}
-    >
-      <div className='search-bar'>
+    <div className="main">
+      <div className='search-bar' >
         <input
           ref={inputRef}
           type='text'
@@ -138,31 +223,263 @@ const Weather = () => {
         />
         <img src={search_icon} alt='' onClick={() => search(inputRef.current.value)} />
       </div>
-      {weatherData ? (
-        <>
-          <img src={weatherData.icon} alt='' className='weather-icon' />
-          <p className='temperature'>{weatherData.temperature}°c</p>
-          <p className='location'>{weatherData.location}</p>
-          <div className='weather-data'>
-            <div className='col'>
-              <img className='humid' src={humidity_icon} alt='' />
-              <div>
-                <p>{weatherData.humidity}%</p>
-                <span>Humidity</span>
-              </div>
-            </div>
-            <div className='col' id='wind'>
-              <img src={wind_icon} alt='' width='70px' />
-              <div>
-                <p>{weatherData.windSpeed} Km/h</p>
-                <span>Wind Speed</span>
-              </div>
-            </div>
+      <div className="parenting" ref={containerRef}>
+        <ProgressBar progress={progress} /> {/* Add ProgressBar here */}
+
+        <div
+          className='weather' id='ww'
+          style={{
+            backgroundImage: `linear-gradient(${gradientAngle}deg, #000000, #134980, #f18719)`, // Apply dynamic gradient
+          }}
+        >
+          <div className='search-bar' id='mobile-search'>
+            <input
+              ref={inputRef}
+              type='text'
+              placeholder='Search city name'
+              onKeyDown={(e) => e.key === 'Enter' && search(e.target.value)}
+            />
+            <img src={search_icon} alt='' onClick={() => search(inputRef.current.value)} />
           </div>
-        </>
-      ) : (
-        <p>Please enter a city name</p>
-      )}
+          {weatherData ? (
+            <>
+              <img src={weatherData.icon} alt='' className='weather-icon' id='except-icon' />
+              <p className='day'>{weeking(0)}</p>
+              <p className='temperature'>{weatherData.temperature}°c</p>
+              <p className='location'>{weatherData.location}</p>
+              <div className="weather-parent">
+                <div className="weather-child">
+                  <img src={weatherData1.icon} alt='' className='weather-icon-small' />
+                  <p className='day-small'>{weeking(1)}</p>
+                  <p className='temperature-small'>{weatherData1.temperature}°c</p>
+                  <p className='location-small'>{weatherData1.location}</p>
+                  <div className='weather-data-small' >
+                    <div className='col-small'>
+                      <img className='humid-small' src={humidity_icon} alt='' />
+                      <div>
+                        <p>{weatherData1.humidity}%</p>
+                        <span>Humidity</span>
+                      </div>
+                    </div>
+                    <div className='col-small'>
+                      <img src={wind_icon} alt='' width='20px' />
+                      <div>
+                        <p>{weatherData1.windSpeed} Km/h</p>
+                        <span>Wind Speed</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="weather-child">
+                  <img src={weatherData2.icon} alt='' className='weather-icon-small' />
+                  <p className='day-small'>{weeking(2)}</p>
+                  <p className='temperature-small'>{weatherData2.temperature}°c</p>
+                  <p className='location-small'>{weatherData2.location}</p>
+                  <div className='weather-data-small' >
+                    <div className='col-small'>
+                      <img className='humid-small' src={humidity_icon} alt='' />
+                      <div>
+                        <p>{weatherData2.humidity}%</p>
+                        <span>Humidity</span>
+                      </div>
+                    </div>
+                    <div className='col-small'>
+                      <img src={wind_icon} alt='' width='20px' />
+                      <div>
+                        <p>{weatherData2.windSpeed} Km/h</p>
+                        <span>Wind Speed</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="weather-child">
+                  <img src={weatherData3.icon} alt='' className='weather-icon-small' />
+                  <p className='day-small'>{weeking(3)}</p>
+                  <p className='temperature-small'>{weatherData3.temperature}°c</p>
+                  <p className='location-small'>{weatherData3.location}</p>
+                  <div className='weather-data-small' >
+                    <div className='col-small'>
+                      <img className='humid-small' src={humidity_icon} alt='' />
+                      <div>
+                        <p>{weatherData3.humidity}%</p>
+                        <span>Humidity</span>
+                      </div>
+                    </div>
+                    <div className='col-small'>
+                      <img src={wind_icon} alt='' width='20px' />
+                      <div>
+                        <p>{weatherData3.windSpeed} Km/h</p>
+                        <span>Wind Speed</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+              <div className='weather-data' id="margining">
+                <div className='col'>
+                  <img className='humid' src={humidity_icon} alt='' />
+                  <div>
+                    <p>{weatherData.humidity}%</p>
+                    <span>Humidity</span>
+                  </div>
+                </div>
+                <div className='col' id='wind'>
+                  <img src={wind_icon} alt='' width='70px' />
+                  <div>
+                    <p>{weatherData.windSpeed} Km/h</p>
+                    <span>Wind Speed</span>
+                  </div>
+                </div>
+              </div>
+            </>
+          ) : (
+            <p>Please enter a city name</p>
+          )}
+        </div>
+
+        <div
+          className='weather'
+          style={{
+            backgroundImage: `linear-gradient(${gradientAngle}deg, #000000, #134980, #f18719)`, // Apply dynamic gradient
+          }}
+        >
+          {weatherData1 ? (
+            <>
+              <img src={weatherData1.icon} alt='' className='weather-icon' />
+              <p className='day'>{weeking(1)}</p>
+              <p className='temperature'>{weatherData1.temperature}°c</p>
+              <p className='location'>{weatherData1.location}</p>
+              <div className='weather-data' >
+                <div className='col'>
+                  <img className='humid' src={humidity_icon} alt='' />
+                  <div>
+                    <p>{weatherData1.humidity}%</p>
+                    <span>Humidity</span>
+                  </div>
+                </div>
+                <div className='col' id='wind'>
+                  <img src={wind_icon} alt='' width='70px' />
+                  <div>
+                    <p>{weatherData1.windSpeed} Km/h</p>
+                    <span>Wind Speed</span>
+                  </div>
+                </div>
+              </div>
+            </>
+          ) : (
+            <p>Please enter a city name</p>
+          )}
+        </div>
+
+        <div
+          className='weather'
+          style={{
+            backgroundImage: `linear-gradient(${gradientAngle}deg, #000000, #134980, #f18719)`, // Apply dynamic gradient
+          }}
+        >
+
+          {weatherData2 ? (
+            <>
+              <img src={weatherData2.icon} alt='' className='weather-icon' />
+              <p className='day'>{weeking(2)}</p>
+              <p className='temperature'>{weatherData2.temperature}°c</p>
+              <p className='location'>{weatherData2.location}</p>
+              <div className='weather-data' >
+                <div className='col'>
+                  <img className='humid' src={humidity_icon} alt='' />
+                  <div>
+                    <p>{weatherData2.humidity}%</p>
+                    <span>Humidity</span>
+                  </div>
+                </div>
+                <div className='col' id='wind'>
+                  <img src={wind_icon} alt='' width='70px' />
+                  <div>
+                    <p>{weatherData2.windSpeed} Km/h</p>
+                    <span>Wind Speed</span>
+                  </div>
+                </div>
+              </div>
+            </>
+          ) : (
+            <p>Please enter a city name</p>
+          )}
+        </div>
+
+        <div
+          className='weather'
+          style={{
+            backgroundImage: `linear-gradient(${gradientAngle}deg, #000000, #134980, #f18719)`, // Apply dynamic gradient
+          }}
+        >
+
+          {weatherData3 ? (
+            <>
+              <img src={weatherData3.icon} alt='' className='weather-icon' />
+              <p className='day'>{weeking(3)}</p>
+              <p className='temperature'>{weatherData3.temperature}°c</p>
+              <p className='location'>{weatherData3.location}</p>
+              <div className='weather-data' >
+                <div className='col'>
+                  <img className='humid' src={humidity_icon} alt='' />
+                  <div>
+                    <p>{weatherData3.humidity}%</p>
+                    <span>Humidity</span>
+                  </div>
+                </div>
+                <div className='col' id='wind'>
+                  <img src={wind_icon} alt='' width='70px' />
+                  <div>
+                    <p>{weatherData3.windSpeed} Km/h</p>
+                    <span>Wind Speed</span>
+                  </div>
+                </div>
+              </div>
+            </>
+          ) : (
+            <p>Please enter a city name</p>
+          )}
+        </div>
+
+        <div
+          className='weather'
+          style={{
+            backgroundImage: `linear-gradient(${gradientAngle}deg, #000000, #134980, #f18719)`, // Apply dynamic gradient
+          }}
+        >
+
+          {weatherData4 ? (
+            <>
+              <img src={weatherData4.icon} alt='' className='weather-icon' />
+              <p className='day'>{weeking(4)}</p>
+              <p className='temperature'>{weatherData4.temperature}°c</p>
+              <p className='location'>{weatherData4.location}</p>
+              <div className='weather-data' >
+                <div className='col'>
+                  <img className='humid' src={humidity_icon} alt='' />
+                  <div>
+                    <p>{weatherData4.humidity}%</p>
+                    <span>Humidity</span>
+                  </div>
+                </div>
+                <div className='col' id='wind'>
+                  <img src={wind_icon} alt='' width='70px' />
+                  <div>
+                    <p>{weatherData4.windSpeed} Km/h</p>
+                    <span>Wind Speed</span>
+                  </div>
+                </div>
+              </div>
+            </>
+          ) : (
+            <p>Please enter a city name</p>
+          )}
+        </div>
+
+      </div >
     </div>
   );
 };
