@@ -3,7 +3,7 @@
     flex-wrap: nowrap; 
     gap: 20px; 
     overflow-x: auto; 
-    overflow-y: hidden; 
+    overflow-y: auto; 
     padding: 20px; 
     padding-top:2%;
     scroll-behavior: smooth; 
@@ -16,7 +16,7 @@
 .main{
     padding-top:3%;
     overflow-x: auto; 
-    overflow-y: hidden; 
+    overflow-y: auto; 
 }
 #mobile-search{
     display:none;
@@ -118,17 +118,20 @@
 
 
 @media (max-width: 730px){
+    .main{
+        padding:0;
+    }
+    .parenting {
+        padding:0;
+    }
     #windingg{
         width:20px;
     }
     .weather-parent{
         display: grid;
         margin-top:6%;
-        grid-template-columns: auto auto auto auto;
+        grid-template-columns: auto auto auto ;
         grid-gap: 10px;
-        padding: 10px;
-        margin-left:6%;
-        margin-right:3%;
         margin-bottom:60px;
     }
     .weather-parent >.weather-child{
@@ -137,6 +140,7 @@
         text-align: center;
         font-size: 30px;
         width:fit-content;
+        min-width:115px;
         height:110%;
         border:1px solid black;
         border-radius: 6%;
@@ -161,7 +165,6 @@
         margin-top:20px;
         display: flex;
         align-items: flex-start;
-        gap: 1px; 
         font-size: 9px;  
     }
     .weather-data-small .col-small span {
@@ -189,15 +192,16 @@
     }
     .weather{
         display: none; 
-        position:fixed;
+        position:relative;
         margin:0;
         top:0;
         left:0;
         width: 100%; 
-        height: 100%;
+        height: 100vh;
         border-radius: 0px !important;
         box-shadow: 0px !important;
     }
+    
 
     
     #margining.weather-data{
