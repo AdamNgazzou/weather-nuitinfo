@@ -1,23 +1,10 @@
-.parenting {
-    display: flex; 
-    flex-wrap: nowrap; 
-    gap: 20px; 
-    overflow-x: auto; 
-    overflow-y: auto; 
-    padding: 20px; 
-    padding-top:2%;
-    scroll-behavior: smooth; 
-    white-space: nowrap; 
-    cursor:grab;
+
+header{
+    width:100%;
+    height:10vh;
+    border: 1px black solid ;
 }
-.weather-parent{
-    display:none;
-}
-.main{
-    padding-top:3%;
-    overflow-x: auto; 
-    overflow-y: auto; 
-}
+
 #mobile-search{
     display:none;
 
@@ -29,22 +16,7 @@
     display: none; 
 }
 
-.weather {
-    padding: 40px; 
-    border-radius: 30px; 
-    background-image: linear-gradient(1deg, #000000, #134980, #f18719);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    border: #2f4680 solid;
-    margin-left: 2%; 
-    margin-right: auto; 
-    margin-top: 2%; 
-    margin-bottom: 2%;
-    width: 430px; 
-    height: 520px; 
-    user-select: none;
-}
+
 
 .search-bar {
     position:static;

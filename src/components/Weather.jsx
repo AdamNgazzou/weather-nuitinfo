@@ -219,18 +219,20 @@ const Weather = () => {
         ? { backgroundImage: `linear-gradient(${gradientAngle}deg, #000000, #134980, #f18719)` } // Apply dynamic gradient
         : {}),
     }}>
-      <div className='search-bar' >
-        <input
-          ref={inputRef}
-          type='text'
-          placeholder='Search city name'
-          onKeyDown={(e) => e.key === 'Enter' && search(e.target.value)}
-        />
-        <img src={search_icon} alt='' onClick={() => search(inputRef.current.value)} />
-      </div>
-      <div className="parenting" ref={containerRef}>
-        <ProgressBar progress={progress} /> {/* Add ProgressBar here */}
-      </div >
+      <header>
+        <div className='search-bar' >
+          <input
+            ref={inputRef}
+            type='text'
+            placeholder='Search city name'
+            onKeyDown={(e) => e.key === 'Enter' && search(e.target.value)}
+          />
+          <img src={search_icon} alt='' onClick={() => search(inputRef.current.value)} />
+        </div>
+        <div className="parenting" ref={containerRef}>
+          <ProgressBar progress={progress} /> {/* Add ProgressBar here */}
+        </div >
+      </header>
     </div>
   );
 };
