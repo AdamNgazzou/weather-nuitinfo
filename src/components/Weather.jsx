@@ -54,6 +54,24 @@ import {
     '13d': snow_icon_day,
     '13n': snow_icon_night,
   };
+  const namee = {
+    '01d': "clear day",
+    '01n': "clear night",
+    '02d': "cloud day",
+    '02n': "cloud night",
+    '03d': "cloud day",
+    '03n': "cloud night",
+    '04d': "drizzle day",
+    '04n': "drizzle night",
+    '09d': "rain",
+    '09n': "rain",
+    '10d': "rain",
+    '11d': "thunderStrom day",
+    '11n': "thunderStrom night",
+    '10n': "rain",
+    '13d': "snow day",
+    '13n': "snow night",
+  };
 
   const calculateGradientAngle = (timezoneOffset) => {
     const currentDate = new Date();
@@ -102,8 +120,8 @@ import {
       // Set weather data for different time slots
       const updateWeatherData = (index) => {
         const icon = allIcons[data.list[index].weather[0].icon] || clear_icon_day;
-        const rain = data.list[index].rain ? data.list[index].rain["3h"] : 0; // Precipitation (in mm)
-
+        const name = namee[data.list[index].weather[0].icon];
+        console.log(name);
         return {
           humidity: data.list[index].main.humidity,
           windSpeed: data.list[index].wind.speed,
@@ -114,6 +132,11 @@ import {
           temperature4: Math.floor(data.list[3].main.temp),
           temperature5: Math.floor(data.list[4].main.temp),
           temperature6: Math.floor(data.list[5].main.temp),
+
+          maxtempday1: Math.floor(data.list[7].main.temp_max),
+          maxtempday2: Math.floor(data.list[15].main.temp_max),
+          maxtempday3: Math.floor(data.list[23].main.temp_max),
+
 
 
           sunrise: secondsToTime(data.city.sunrise),
@@ -127,6 +150,7 @@ import {
           time6: secondsToTime(data.list[5].dt),
           location: data.city.name,
           icon: icon,
+          name: name,
         };
       };
       setWeatherData(updateWeatherData(0));
@@ -186,28 +210,28 @@ import {
   }
   const productSales = [
     {
-      time: weatherData3.time0,
-      Today_temperature: weatherData3.temperature1,
+      time: weatherData.time0,
+      Today_temperature: weatherData.temperature1,
     },
     {
-      time: weatherData3.time1,
-      Today_temperature: weatherData3.temperature2,
+      time: weatherData.time1,
+      Today_temperature: weatherData.temperature2,
     },
     {
-      time: weatherData3.time3,
-      Today_temperature: weatherData3.temperature3,
+      time: weatherData.time3,
+      Today_temperature: weatherData.temperature3,
     },
     {
-      time: weatherData3.time4,
-      Today_temperature: weatherData3.temperature4,
+      time: weatherData.time4,
+      Today_temperature: weatherData.temperature4,
     },
     {
-      time: weatherData3.time5,
-      Today_temperature: weatherData3.temperature5,
+      time: weatherData.time5,
+      Today_temperature: weatherData.temperature5,
     },
     {
-      time: weatherData3.time6,
-      Today_temperature: weatherData3.temperature6,
+      time: weatherData.time6,
+      Today_temperature: weatherData.temperature6,
     },
   ];
 
@@ -258,6 +282,7 @@ import {
     }
     return null;
   };
+
   return (
     <div className="container">
       {/* Sidebar */}
@@ -273,7 +298,7 @@ import {
       {/* Main Content */}
       <main className="doubling">
 
-        <div className="main-content">
+        <div className="main_content">
           {/* Header */}
           <header className="header">
             <div className="search-bar">
@@ -287,8 +312,14 @@ import {
               <img src={search_icon} alt="Search" />
             </div>
             <div className="header-icons">
-              <span className="icon">🔔</span>
-              <span className="icon">👤</span>
+              <div class="toggle-container">
+                <input type="checkbox" id="toggle" />
+                <label for="toggle" class="toggle-label">
+                  <span class="sun">☀️</span>
+                  <span class="moon">🌙</span>
+                  <div class="toggle-circle"></div>
+                </label>
+              </div>
             </div>
           </header>
 
@@ -300,7 +331,7 @@ import {
               <div className="loc-row">
                 <div className='loc1'>
                   <h4>Current Location</h4>
-                  <h3>{weatherData3.location}</h3>
+                  <h3>{weatherData.location}</h3>
                 </div>
                 <div className='loc2'>
                   <img src={weatherData1.icon} alt='' className='weather-icon-small' />
@@ -311,7 +342,7 @@ import {
               <div className="weather-overlay">
                 <center><p className="time">{weeking(0)}</p></center>
                 <center><h1 className="temp">{weatherData.temperature}°C</h1></center>
-                <center><p className="condition">Partly Cloudy</p></center>
+                <center><p className="condition">{weatherData.name}</p></center>
               </div>
             </div>
           </section>
@@ -323,17 +354,17 @@ import {
 
             <div className="highlight">
               <center><h3 className='h3'>Humidity</h3></center>
-              <center><span>{weatherData3.humidity}%</span></center>
+              <center><span>{weatherData.humidity}%</span></center>
             </div>
 
             <div className="highlight">
               <center><h3 className='h3'>Wind</h3></center>
-              <center><span>{weatherData3.windSpeed} km/h</span></center>
+              <center><span>{weatherData.windSpeed} km/h</span></center>
             </div>
 
             <div className="highlight">
               <center><h3 className='h33'>Sunrise & Sunset</h3></center>
-              <center><span>{weatherData3.sunrise} AM | {weatherData3.sunset} PM</span></center>
+              <center><span>{weatherData.sunrise} AM | {weatherData.sunset} PM</span></center>
             </div>
           </section>
           <center>
@@ -355,22 +386,42 @@ import {
             </div>
           </div>
           {/* 3-Day Forecast */}
-          <div className="forecast">
-            <h4>3 Days Forecast</h4>
-            <div className="forecast-item">
-              <p>Tuesday</p>
-              <span>26°C / 11°C</span>
-              <span>Cloudy</span>
-            </div>
-            <div className="forecast-item">
-              <p>Wednesday</p>
-              <span>26°C / 11°C</span>
-              <span>Rainy</span>
-            </div>
-            <div className="forecast-item">
-              <p>Thursday</p>
-              <span>26°C / 11°C</span>
-              <span>Snowfall</span>
+          <div className="forecast-container">
+
+            <div className="forecast">
+              <h2>3 Days Forecast</h2>
+              <div className="day">
+                <div className="temp">
+                  <span className="high">{weatherData1.maxtempday1}° </span>
+
+                </div>
+                <div className="details">
+                  <p className="day-name">{weeking(1)}</p>
+                  <p className="weather">{weatherData1.name}</p>
+                  <img src={weatherData1.icon} alt='' className='weather-icon-small' />
+                </div>
+              </div>
+              <div className="day">
+                <div className="details">
+                  <p className="day-name">{weeking(2)}</p>
+                  <p className="weather">{weatherData2.name}</p>
+                  <img src={weatherData2.icon} alt='' className='weather-icon-small' />
+                </div>
+                <div className="temp">
+                  <span className="high">{weatherData3.maxtempday2}° </span>
+                </div>
+
+              </div>
+              <div className="day">
+                <div className="temp">
+                  <span className="high">{weatherData3.maxtempday3}°</span>
+                </div>
+                <div className="details">
+                  <p className="day-name">{weeking(3)}</p>
+                  <p className="weather">{weatherData3.name}</p>
+                  <img src={weatherData3.icon} alt='' className='weather-icon-small' />
+                </div>
+              </div>
             </div>
           </div>
         </section>
