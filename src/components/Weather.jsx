@@ -34,7 +34,8 @@ import {
   const [weatherData4, setWeatherData4] = useState(false);
   const [gradientAngle, setGradientAngle] = useState(180); // Start with 180 degrees
   const [progress, setProgress] = useState(0); // State for progress
-
+  const [isImperial, setIsImperial] = useState(false)
+  const [isNightMode, setIsNightMode] = useState(false);
 
   const allIcons = {
     '01d': clear_icon_day,
@@ -72,7 +73,18 @@ import {
     '13d': "snow day",
     '13n': "snow night",
   };
+  const toggleUnits = () => {
+    setIsImperial(!isImperial);
+  };
 
+  // Function to convert temperature and wind speed
+  const convertTemperature = (temp) => {
+    return isImperial ? Math.floor(temp * 9 / 5 + 32) : Math.floor(temp); // Celsius to Fahrenheit conversion
+  };
+
+  const convertWindSpeed = (speed) => {
+    return isImperial ? Math.floor(speed * 0.621371) : Math.floor(speed); // km/h to mph conversion
+  };
   const calculateGradientAngle = (timezoneOffset) => {
     const currentDate = new Date();
     const localTime = new Date(currentDate.getTime() + timezoneOffset * 1000);
@@ -124,18 +136,18 @@ import {
         console.log(name);
         return {
           humidity: data.list[index].main.humidity,
-          windSpeed: data.list[index].wind.speed,
-          temperature: Math.floor(data.list[index].main.temp),
-          temperature1: Math.floor(data.list[0].main.temp),
-          temperature2: Math.floor(data.list[1].main.temp),
-          temperature3: Math.floor(data.list[2].main.temp),
-          temperature4: Math.floor(data.list[3].main.temp),
-          temperature5: Math.floor(data.list[4].main.temp),
-          temperature6: Math.floor(data.list[5].main.temp),
+          windSpeed: convertWindSpeed(data.list[index].wind.speed),
+          temperature: convertTemperature(Math.floor(data.list[index].main.temp)),
+          temperature1: convertTemperature(Math.floor(data.list[0].main.temp)),
+          temperature2: convertTemperature(Math.floor(data.list[1].main.temp)),
+          temperature3: convertTemperature(Math.floor(data.list[2].main.temp)),
+          temperature4: convertTemperature(Math.floor(data.list[3].main.temp)),
+          temperature5: convertTemperature(Math.floor(data.list[4].main.temp)),
+          temperature6: convertTemperature(Math.floor(data.list[5].main.temp)),
 
-          maxtempday1: Math.floor(data.list[7].main.temp_max),
-          maxtempday2: Math.floor(data.list[15].main.temp_max),
-          maxtempday3: Math.floor(data.list[23].main.temp_max),
+          maxtempday1: convertTemperature(Math.floor(data.list[7].main.temp_max)),
+          maxtempday2: convertTemperature(Math.floor(data.list[15].main.temp_max)),
+          maxtempday3: convertTemperature(Math.floor(data.list[23].main.temp_max)),
 
 
 
@@ -173,10 +185,61 @@ import {
       setIsSearching(false);
     }
   };
+  useEffect(() => {
+    const toggle = document.getElementById("toggle");
+    const mainContent = document.querySelector(".main_content");
+    const highlights = document.querySelectorAll(".highlight"); // Use querySelectorAll to target all highlights
+    const sidebar = document.querySelector(".sidebar");
+    const rain_chances = document.querySelector(".rain-chances");
+    const doubling = document.querySelector(".doubling");
+    const forecast_container = document.querySelector(".forecast-container");
+    const section_right = document.querySelector(".section-right");
+    const days = document.querySelectorAll(".day");
 
+    const temps = document.querySelectorAll(".temp"); // Use querySelectorAll to target all highlights
+
+
+
+    const handleToggle = () => {
+      setIsNightMode((prevState) => !prevState);
+      mainContent.classList.toggle("night-mode");
+      sidebar.classList.toggle("night-mode");
+      forecast_container.classList.toggle("night-mode");
+
+      section_right.classList.toggle("night-mode");
+      rain_chances.classList.toggle("night-mode");
+      doubling.classList.toggle("night-mode");
+
+
+
+
+
+
+
+      // Toggle night-mode for all elements with the class highlight
+      highlights.forEach((highlight) => {
+        highlight.classList.toggle("night-mode");
+
+      });
+      temps.forEach((temp) => {
+        temp.classList.toggle("night-mode");
+
+      });
+      days.forEach((day) => {
+        day.classList.toggle("night-mode");
+
+      });
+    };
+
+    toggle.addEventListener("change", handleToggle);
+
+    return () => {
+      toggle.removeEventListener("change", handleToggle);
+    };
+  }, []);
   useEffect(() => {
     search('paris'); // Default search
-  }, []);
+  }, [isImperial]);
 
   useEffect(() => {
     const handleKeyPress = (event) => {
@@ -312,14 +375,18 @@ import {
               <img src={search_icon} alt="Search" />
             </div>
             <div className="header-icons">
-              <div class="toggle-container">
-                <input type="checkbox" id="toggle" />
-                <label for="toggle" class="toggle-label">
-                  <span class="sun">☀️</span>
-                  <span class="moon">🌙</span>
-                  <div class="toggle-circle"></div>
+              <button className="metrics" onClick={toggleUnits}>
+                Switch to {isImperial ? 'Metric' : 'Imperial'} Units
+              </button>
+              <div className="toggle-container">
+                <input type="checkbox" id="toggle" checked={isNightMode} />
+                <label for="toggle" className="toggle-label">
+                  <span className="sun">☀️</span>
+                  <span className="moon">🌙</span>
+                  <div className="toggle-circle"></div>
                 </label>
               </div>
+
             </div>
           </header>
 
@@ -329,22 +396,22 @@ import {
           }}>
             <div className="location">
               <div className="loc-row">
-                <div className='loc1'>
-                  <h4>Current Location</h4>
-                  <h3>{weatherData.location}</h3>
-                </div>
-                <div className='loc2'>
-                  <img src={weatherData1.icon} alt='' className='weather-icon-small' />
-                </div>
+                <center><div className='together'>
+                  <div className='loc2'>
+                    <img src={weatherData1.icon} alt='' className='weather-icon-small' id='e' />
+                  </div>
+                  <div className="weather-info">
+                    <div className="weather-overlay">
+                      <p className="time">{weeking(0)},{weatherData.location}
+                      </p>
+                      <h1>{weatherData.temperature}°{isImperial ? 'F' : 'C'}</h1>
+                      <p>Wind: {weatherData.windSpeed} {isImperial ? 'mph' : 'km/h'}</p>
+                    </div>
+                  </div>
+                </div></center>
               </div>
             </div>
-            <div className="weather-info">
-              <div className="weather-overlay">
-                <center><p className="time">{weeking(0)}</p></center>
-                <center><h1 className="temp">{weatherData.temperature}°C</h1></center>
-                <center><p className="condition">{weatherData.name}</p></center>
-              </div>
-            </div>
+
           </section>
 
           {/* Highlights, Rain Chances, and Forecast */}
