@@ -444,14 +444,7 @@ import {
         </div>
         <section className="section-right">
           {/* Rain Chances */}
-          <div className="rain-chances">
-            <h4>Chance of Rain</h4>
-            <div className="bar-chart">
-              <div className="bar" style={{ width: '10%' }}>9 AM</div>
-              <div className="bar" style={{ width: '50%' }}>3 PM</div>
-              <div className="bar" style={{ width: '70%' }}>6 PM</div>
-            </div>
-          </div>
+
           {/* 3-Day Forecast */}
           <div className="forecast-container">
 
